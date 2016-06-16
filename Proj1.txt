@@ -1,0 +1,36 @@
+<?
+if (isset($_POST['submit'])){
+
+$user = $_POST['submit'];
+$password = $_POST['password'];
+
+if ($user&&$password){
+	if($user=='admin'&&$password=='password'){
+	Start_Session();
+	$_Session['loggedin'] = 'admin';
+	header(Location: contact_list.php);
+	
+	} else {
+	echo "invalid password";
+	}
+	
+
+
+
+
+
+}
+
+
+
+} else {
+echo "type in username and password";
+}
+
+
+
+
+
+
+
+?>

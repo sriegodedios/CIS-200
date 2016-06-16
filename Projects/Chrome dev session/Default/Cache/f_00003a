@@ -1,0 +1,602 @@
+/*
+ * slideteam v0.11.0
+ * Thursday, March 12th, 2015, 12:26:46 PM
+ * Analytics Ninja implementation code
+ */
+/*
+ * https://github.com/google/data-layer-helper
+ * Copyright 2012 Google Inc. All rights reserved.
+ * jQuery v1.9.1 (c) 2005, 2012
+ * jQuery Foundation, Inc. jquery.org/license.
+ */
+(function(){
+    var g=/\[object (Boolean|Number|String|Function|Array|Date|RegExp)\]/;function h(a){return null==a?String(a):(a=g.exec(Object.prototype.toString.call(Object(a))))?a[1].toLowerCase():"object"}function k(a,b){return Object.prototype.hasOwnProperty.call(Object(a),b)}function m(a){if(!a||"object"!=h(a)||a.nodeType||a==a.window)return!1;try{if(a.constructor&&!k(a,"constructor")&&!k(a.constructor.prototype,"isPrototypeOf"))return!1}catch(b){return!1}for(var c in a);return void 0===c||k(a,c)};
+    function n(a,b,c){this.b=a;this.f=b||function(){};this.d=!1;this.a={};this.c=[];this.e=p(this);r(this,a,!c);var d=a.push,e=this;a.push=function(){var b=[].slice.call(arguments,0),c=d.apply(a,b);r(e,b);return c}}window.DataLayerHelper=n;n.prototype.get=function(a){var b=this.a;a=a.split(".");for(var c=0;c<a.length;c++){if(void 0===b[a[c]])return;b=b[a[c]]}return b};n.prototype.flatten=function(){this.b.splice(0,this.b.length);this.b[0]={};s(this.a,this.b[0])};
+    function r(a,b,c){for(a.c.push.apply(a.c,b);!1===a.d&&0<a.c.length;){b=a.c.shift();if("array"==h(b))a:{var d=b,e=a.a;if("string"==h(d[0])){for(var f=d[0].split("."),u=f.pop(),d=d.slice(1),l=0;l<f.length;l++){if(void 0===e[f[l]])break a;e=e[f[l]]}try{e[u].apply(e,d)}catch(v){}}}else if("function"==typeof b)try{b.call(a.e)}catch(w){}else if(m(b))for(var q in b)s(t(q,b[q]),a.a);else continue;c||(a.d=!0,a.f(a.a,b),a.d=!1)}}
+    function p(a){return{set:function(b,c){s(t(b,c),a.a)},get:function(b){return a.get(b)}}}function t(a,b){for(var c={},d=c,e=a.split("."),f=0;f<e.length-1;f++)d=d[e[f]]={};d[e[e.length-1]]=b;return c}function s(a,b){for(var c in a)if(k(a,c)){var d=a[c];"array"==h(d)?("array"==h(b[c])||(b[c]=[]),s(d,b[c])):m(d)?(m(b[c])||(b[c]={}),s(d,b[c])):b[c]=d}};
+})();
+/* global addthis,DataLayerHelper,helper */
+(function () {
+    "use strict";
+	"use supernew";
+
+
+    _ninja.init({
+        engines: [
+            { 'type': 'echo' },
+            { 'type': 'gtm' }
+        ],
+        'video-youtube': {
+            enabled:true
+        },
+		'social':false ,
+        implementationVersion: '0.11.0',
+        debug: false
+    });
+//add to this click
+        if (typeof(addthis) !== 'undefined') {
+            addthis.addEventListener('addthis.menu.share', function(e) {
+                var social_action;
+				var social_network;
+				social_network=e.data.service;
+				switch(e.data.service)
+				{
+					case "twitter": 
+					case "tweet":
+						social_action = 'tweet';
+						social_network="twitter";
+						break;
+					case "facebook_like": 
+						social_action = 'like';
+						social_network= 'facebook';
+						break;
+					case "facebook_unlike": 
+						social_action = 'unlike';
+						social_network= 'facebook';
+						break;
+					default:
+						social_action = 'share';
+					
+				}
+				dataLayer.push({
+					event: 'gaSocial',
+					gaSocialActivityNetwork: social_network,
+					gaSocialActivityAction:social_action,
+					gaSocialActivityTarget:document.URL
+				});
+            });
+        }
+//DOM Ready
+    jQuery(function () {
+       window.helper = new DataLayerHelper(dataLayer);
+	
+		function clean_Camel(stringToClean)
+		{
+			var aClean=stringToClean.replace("&amp;"," " ).replace("<br>"," ").toLowerCase().split(" ");
+			var answer="";
+			for (var i=0;i<aClean.length;i++)
+			{
+				
+				if(aClean[i].length>1)
+				{
+					if(answer.length >2)
+					{
+						answer += " ";
+					}
+					answer+=aClean[i].charAt(0).toUpperCase() + aClean[i].slice(1);
+				}
+			}
+			return answer;
+		}
+		
+        //Click on logo
+        jQuery(document).on('mousedown', '.logo', function () {
+            dataLayer.push({
+                event: 'Logo Clicked',
+            });
+        });
+
+        //top button
+        jQuery(document).on('mousedown', '.logregbtn a' , function () {
+            dataLayer.push({
+                event: 'Top Buttons Clicked',
+                buttonName:clean_Camel( jQuery(this).attr("title") ? jQuery(this).attr("title") :jQuery(this).attr("rel"))
+            });
+        });
+
+        //top Menu
+        jQuery(document).on('mousedown', '.navmain a', function () {
+			dataLayer.push({
+                event: 'Top Menu Clicked',
+                menuLink: clean_Camel(jQuery(this).html())
+            });
+        });
+        
+        //Breadcrumbs Click
+        jQuery(document).on('mousedown', '.breadcrumbs a', function () {
+
+            var currentPosition = jQuery('.breadcrumbs a,.breadcrumbs strong').map(function () {
+                return jQuery.trim(jQuery(this).text());
+            });
+            currentPosition = Array.prototype.slice.call(currentPosition).join(">");
+            var click_on = jQuery.trim(jQuery(this).text());
+            var next = currentPosition.split(click_on)[0] + click_on;
+
+            dataLayer.push({
+                event: 'BreadCrumb Clicked',
+                currentCategory: currentPosition,
+                nextCategory: next
+
+            });
+        });
+
+        //left navigation
+        jQuery(document).on('mousedown', '#mega-3 a,,#mega-3 span span', function () {
+
+            var category = '';
+            var subCategory = '';
+            if(jQuery(this).is('span'))
+            {
+                category = jQuery(this).parent().parent().siblings().find('a').first().attr("category");
+                subCategory = jQuery.trim(jQuery(this).text());
+
+            }
+            else
+            {
+                category = jQuery(this).attr("category");
+                subCategory = jQuery.trim(jQuery(this).text());
+                if(category=== undefined)
+				{
+					category=subCategory;
+					subCategory = 'Main';
+				}
+            }
+            dataLayer.push({
+                event: 'Left Navigation Clicked',
+                linkCategory: category,
+                linkSubcategory: subCategory
+
+
+            });
+        });
+
+        //Customer box
+        jQuery(document).on('mousedown', '.customerbox a', function () {
+            dataLayer.push({
+                event: 'Left Navigation Clicked',
+                linkCategory: 'Customer box',
+                linkSubcategory: jQuery('input[id=search]').text()
+            });
+        });
+
+        //Most_download|Newly Added event
+        jQuery(document).on('mousedown', '.customerboxLast a', function () {
+            dataLayer.push({
+                event: 'Featured Product Clicked',
+                linkCategory: jQuery(this).parent().parent().parent().find('p').text() ==="" ? jQuery(this).parent().parent().parent().parent().find('p').text() : jQuery(this).parent().parent().parent().find('p').text(),
+				productName: jQuery(this).attr('title') ? jQuery(this).attr('title') :jQuery(this).text()
+            });
+        });
+
+        //Free sample
+        jQuery(document).on('mousedown', '#signup_download1' , function () {
+            dataLayer.push({
+                event: 'CTA',
+                ctaName: 'Free sample',
+                
+            });
+        });
+
+
+        //Footer Navigation
+        jQuery(document).on('mousedown', '.footerleft a', function () {
+			var link=jQuery.trim(jQuery(this).text());
+			if (jQuery(this).parent().is('h2'))
+			{
+				link="Main";
+			}
+            dataLayer.push({
+                event: 'Footer Navigation Clicked',
+                linkCategory: jQuery.trim(jQuery(this ).parents('div').find('h2').first().text()),
+                linkSubcategory: link,
+        });
+    });
+    //Footer Navigation
+    jQuery(document).on('mousedown', '.quicklink a', function () {
+        dataLayer.push({
+            event: 'Footer Navigation Clicked',
+            linkCategory: 'QUICK LINKS',
+            linkSubcategory: jQuery.trim(jQuery(this).text())
+        });
+    });
+
+    //Social Link Navigation
+    jQuery(document).on('mousedown', '.sociicons a', function () {
+        dataLayer.push({
+            event: 'Footer Navigation Clicked',
+            linkCategory: 'Social Link',
+            linkSubcategory: jQuery(this).attr("href")
+        });
+    });
+
+    // Home Page Slider
+    jQuery(document).on('mousedown', '#gooeymenu2 a', function () {
+        dataLayer.push({
+            event: 'Home Slide Clicked',
+            slide:  jQuery.trim(jQuery(this).text())
+        });
+    });
+	//home page events only
+	if(helper.get('pageName')=='home')
+	{
+		jQuery(document).on('mousedown', '.best-selling a,.best-selling .viewallbtn', function () {
+				dataLayer.push({
+					event: 'Category Clicked On Home',
+					productCategory: clean_Camel(jQuery.trim(jQuery(this).parents('td').first().find('h2 a').text()))
+				});
+		});
+		jQuery(document).on('mousedown', '.whatshot a,.whatshot .viewmorebtn', function () {
+				dataLayer.push({
+					event: 'Most Download Clicked On Home',
+					productName: clean_Camel(jQuery.trim(jQuery(this).parents('td').first().find('p a').attr('title')))
+				});
+		});
+	}
+            
+	
+    //chat click
+    jQuery('#livechat-compact-view').contents().find('a').mousedown(function() {
+        dataLayer.push({
+            event: 'Footer Chat Clicked'
+        });
+    });
+
+
+    //Design services popup
+    jQuery(document).on('mousedown', '#popupContact a', function () {
+        dataLayer.push({
+            event: 'Design Service Popup',
+            action:  jQuery(this).hasClass('close') ? 'Close': 'Learn More'
+        });
+
+    });
+	//search pages
+		//tab
+	jQuery(document).on('mousedown', '.gsc-tabsArea div', function () 
+	 {
+        dataLayer.push({
+            event: 'Search Tab Selected',
+            tab: jQuery(this).text()
+        });
+    });
+	//image and slides
+	jQuery(document).on('mousedown', '.gsc-table-result div a,.gs-imageResult-column a', function () 
+	 {
+		var parent=jQuery(this).parent().parent().parent();
+		var category="Web";
+		if(parent.hasClass("gsc-imageResult") ||parent.hasClass("gs-imageResult") )
+		{
+			category="Image";
+		}
+	 dataLayer.push({
+            event: 'Search Item Selected',
+            productType:category,
+            productName: parent.find("a.gs-title").text()
+        });
+    });
+
+	
+
+    //category pages
+
+    //Page navigation
+    jQuery(document).on('mousedown', '.pagging a', function () {
+        dataLayer.push({
+            event: 'Page Index Navigation',
+            currentPage:jQuery.trim(jQuery('.pages .current').first().text()),
+            selectedPage: jQuery.trim(jQuery(this).text()) ? jQuery.trim(jQuery(this).text()) : jQuery(this).attr("title")
+        });
+    });
+
+        //items per page
+        jQuery(document).on('change', 'div.limiter select', function () {
+            dataLayer.push({
+                event: 'Item Per PageChanged',
+                products: jQuery.trim(jQuery(this).find('option:selected').text())
+
+            });
+        });
+
+        //Template Clicked bottom
+		//text
+        jQuery(document).on('mousedown', '.product-name a', function () {
+		    var pageName = helper.get('pageName');
+    
+			if(pageName=="Search Result")
+			{
+				dataLayer.push({
+					event: 'Template Clicked On Search',
+					productName: jQuery.trim(jQuery(this).attr("title"))
+				});
+			}
+			else
+			{
+				dataLayer.push({
+					event: 'Template Clicked',
+					productName: jQuery.trim(jQuery(this).attr("title"))
+				});	
+			}
+        });
+		//image
+		jQuery(document).on('mousedown', '.products-grid a.product-image', function () {
+		    var pageName = helper.get('pageName');
+            if(pageName=="Search Result")
+			{
+				dataLayer.push({
+					event: 'Template Clicked On Search',
+                	productName: jQuery.trim(jQuery(this).parent().find('input.viewbluebtn').parent().find('a').attr("title"))
+				});
+			}
+			else
+			{
+				dataLayer.push({
+					event: 'Template Clicked',
+					productName: jQuery.trim(jQuery(this).parent().find('input.viewbluebtn').parent().find('a').attr("title"))
+				});	
+			}
+			
+        });
+		
+        //view button
+        jQuery(document).on('mousedown', 'input.viewbluebtn', function () {
+		    var pageName = helper.get('pageName');
+            if(pageName=="Search Result")
+			{
+				dataLayer.push({
+					event: 'Template Clicked On Search',
+					productName: jQuery.trim(jQuery(this).parent().find('a').attr("title"))
+				});
+			}
+			else
+			{
+				dataLayer.push({
+					event: 'Template Clicked',
+					productName: jQuery.trim(jQuery(this).parent().find('a').attr("title"))
+				});	
+			}
+        });
+
+        //Recommended Templates
+        jQuery(document).on('mousedown', '.poppowdiagram a', function () {
+			var itemName=jQuery.trim(jQuery(this).parent().find('a:not(.product-image)').attr("title"));
+			if (itemName.length <2)
+			{
+				itemName="Main Category";
+			}
+            dataLayer.push({
+                event: 'Recommended Product Clicked',
+                productCategory: jQuery.trim(jQuery(this).parents('.category-products').children().first().text()),
+                productName: itemName
+
+            });
+        });
+
+
+        //Product Pages
+        
+		//Pin it
+		jQuery(document).on('mousedown', 'a[title="Pin it!"]', function () {
+			dataLayer.push({
+					event: 'gaSocial',
+					gaSocialActivityNetwork: 'Pinterest',
+					gaSocialActivityAction: 'Pin',
+					gaSocialActivityTarget:document.URL
+				});
+		});
+		
+        //Slide Top
+        jQuery(document).on('mousedown', '.carousel-control', function () {
+            var image= parseInt(jQuery('#image_no').text());
+			var allImages= parseInt(jQuery("#input").val());
+			if(jQuery(this).hasClass('previous'))
+            {
+				image = image==1 ? allImages : (image-1);
+				
+            }
+            else
+            {
+                image = image ==allImages ? 1 :  (image+1) ;
+            }
+
+            dataLayer.push({
+                event: 'Display Top Slide',
+                slideItem:image
+
+            });
+        });
+
+
+        //Related Category
+        jQuery(document).on('mousedown', '.sharesmalltag,.sharebigtag', function () {
+            dataLayer.push({
+                event: 'Related Category Clicked',
+                category: jQuery.trim(jQuery(this).text())
+
+            });
+        });
+
+        //Product TAG Keywords
+        jQuery(document).on('mousedown', '.product-tags a', function () {
+            dataLayer.push({
+                event: 'Related Keywords Clicked',
+                keywords: jQuery.trim(jQuery(this).text())
+
+
+            });
+        });
+
+
+        //Visual Diagram Finder
+        jQuery(document).on('mousedown', '.whole-box a', function () {
+            dataLayer.push({
+                event: 'Visual Diagram Finder CTA',
+                locationPath: location.pathname.substring(1)
+
+            });
+        });
+
+        // Download now
+        jQuery(document).on('mousedown', '.downloadbtn`,.downloadbtnenable', function () {
+            dataLayer.push({
+                event: 'Download Now ClickedProduct Pages',
+                productName: jQuery('title').text().split('|')[0]
+
+            });
+        });
+        //Bottom slides
+        jQuery(document).on('mousedown', '.box-up-sell a', function () {
+			var tmp= jQuery(this).attr('title').split('Slide');
+            var image=0;
+			try
+			{
+				image=parseInt(tmp[tmp.length-1]);
+			}
+			catch(e) {}
+            dataLayer.push({
+                event: 'Viewed Bottom Slide',
+                slideItem:image
+
+            });
+        });
+
+        
+        //Pricing Page
+        jQuery(document).on('mousedown', '.join-now a', function () {
+            dataLayer.push({
+                event: 'Add to Cart',
+                subscriptionName: jQuery(this).parents('table').first().find('tr').first().find('td').eq(jQuery(this).parent().parent().index()).text(),
+                subscriptionvalue:Number(jQuery.trim(jQuery(this).parent().parent().text()).replace(/[^0-9\.]+/g,""))
+            });
+        });
+        //FAQ
+        jQuery(document).on('mousedown', '.faqtitle', function () {
+            //if close do not send event
+			if( jQuery(this).next().css("display")!="none" )
+			{
+				return;
+			}
+			dataLayer.push({
+                event: 'FAQ Opened',
+                FAQname: jQuery.trim(jQuery(this).text())
+            });
+        });
+        
+		//Template Finder
+        //category selected
+        jQuery(document).on('mousedown', '.subcategorybox_small a', function () {
+            dataLayer.push({
+                event: 'Template Finder Category Selected',
+                category: jQuery.trim(jQuery(this).parent().parent().siblings('.categorymainbox_small').text()),
+                subCategory: jQuery.trim(jQuery(this).parents('.subcategorybox_small').first().find('h1 a').text())
+            });
+        });
+/* Remove node event 
+        //nodes selected
+        jQuery(document).on('change', '.subcategorybox_small select', function () {
+            dataLayer.push({
+                event: 'Template Finder',
+                action: 'Nodes',
+                linkDescription:  jQuery.trim(jQuery(this).parent().siblings('.categorymainbox_small').text())+' ->'+jQuery.trim(jQuery(this).parent().first().find('h1 a').text()) +' ->' +jQuery.trim(jQuery(this).find('option:selected').text())
+
+            });
+        });
+*/  
+  //click on create presentation
+        jQuery(document).on('mousedown', '.visual_home_page_block a', function () {
+            dataLayer.push({
+                event: 'Create a Presentation in 3 Steps Clicked',
+            });
+        });
+        
+		//How To Create an Awesome Powerpoint Presentation in 3 Steps
+        //accordions
+        jQuery(document).on('mousedown', '#accordion,#accordion1,#accordion2', function () {
+            dataLayer.push({
+                event: 'Awesome Powerpoint Presentation Clicked',
+                action: 'Accordion ' + (jQuery(this).find('h3').attr('aria-selected')!= "true" ? 'Open': 'Close'),
+                linkDescription:  jQuery.trim(jQuery(this).parent().parent().find('h2').first().text())
+            });
+        });
+
+
+        //customer login page
+        //create account
+        jQuery(document).on('mousedown', 'img[title="Create an Account"]', function () {
+            dataLayer.push({
+                event: 'Create an Account Clicked'
+            });
+        });
+        //login account
+        jQuery(document).on('mousedown', '#send2,.orexternalaccount a', function () {
+            dataLayer.push({
+                event: 'login Clicked',
+                action: 'login',
+                loginMethod:clean_Camel( jQuery(this).attr("title") ? jQuery(this).attr("title") :jQuery(this).attr("rel"))
+            });
+        });
+
+        //forgot password
+        jQuery(document).on('mousedown', '.f-left', function () {
+            dataLayer.push({
+                event: 'Forgot Password Clicked'
+            });
+        });
+        
+		//Checkout Page
+         //   CheckOut	Change Payment	{{Payment Type}}
+        jQuery(document).on('change', 'input:radio', function () {
+			var temp= jQuery('input:radio:checked').attr("title");
+            dataLayer.push({
+                event: 'Payment Selected',
+                paymentSelectedType: temp.substring(0,temp.indexOf(' '))
+
+        });
+        });
+        //apply coupon
+        jQuery(document).on('mousedown', '#couponapply', function () {
+            dataLayer.push({
+                event: 'Applyed Coupon',
+                action: 'Apply Coupon',
+                couponCode:  jQuery('#coupon_code').val()
+            });
+        });
+        //CheckOut	Place Order	{{Cart_Id?}}
+        jQuery(document).on('mousedown', '#submit', function () {
+            dataLayer.push({
+                event: 'Place Order Clicked',
+				paymentSelectedType:jQuery('input:radio:checked').attr("title").split(' ')[0],
+				paymentValue: jQuery(jQuery('.last>strong>.price')).text().split(' ')[1]
+				
+            });
+        });
+        //  CheckOut	Edit Your Cart	{{Cart_Id?}}
+        jQuery(document).on('mousedown', '#review-buttons-container a', function () {
+            dataLayer.push({
+                event: 'Edit Order Clicked'
+            });
+        });
+        //account links
+        jQuery(document).on('mousedown', '.block-account a', function () {
+            dataLayer.push({
+                event: 'Dashboard Navigation',
+                navigation:   jQuery(this).text()
+            });
+        });
+        // subscription cancel
+        jQuery(document).on('mousedown', 'img[src$="btn_unsubscribe_LG.gif"]', function () {
+            dataLayer.push({
+                event: 'Unsubscribe Clicked'
+            });
+        });
+    });
+})();
