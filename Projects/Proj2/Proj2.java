@@ -1,11 +1,11 @@
-/**
+  /**
  * CIS 200 Project 2
  *
  * Description: This java program is a game of pig in which the player plays against the computer.  
  * 				Each player rolls dice three times. Each number they role (2-6) is counted towards their turn score. After three rolls their turn score is added to the total score.
  *				If they ever role a 1, their turn ends and the total points they get for that turn is 0. The first one with a core of 20 or higher wins! 
  *
- * Note: Alot of this program runs alot of loop statements
+ * Note: Alot of this program runs alot of loop statements. One of the ways how I tackled the problem is using methods. When in statements where it asked questions do you want to play again or roll, I used the do-while loop to ensure the code is excuted at least once before the condition is checked. This ensured there was proper execution of the code. 
  *
  * Requirements: You must include a description of your strategy for the computer, and why you believe it is effective. 
  *				 In addition to the comment block at the top of the file, you should include comments within each file that describe what your code does. 
@@ -44,6 +44,7 @@ public class Proj2 {
 			turn = 1; //sets the turn to 1
 			do{
 					System.out.println("Current score: You have "+playerScore+", Computer has "+computerScore+".");
+					System.out.println(" ");
 				if(turn % 2 == 0){ //this moderator checks to see if the turn number is even or odd
 					
 					
@@ -61,13 +62,15 @@ public class Proj2 {
 		
 			//If your here, that means either score is greater or equal to 20 and it exits the while loop
 		
-			if(playerScore>=20){ //Checks ti see if player score is greater than or equal to 20
-				System.out.println("You won with the score of: "+playerScore+"!"); //Prints you won statement
-				playerWins += 1; //Adds 1 to the total number of player wins 
+				if(playerScore>=20){ 
+					//Checks ti see if player score is greater than or equal to 20
+					System.out.println("You won with the score of: "+playerScore+"!"); //Prints you won statement
+					playerWins += 1; //Adds 1 to the total number of player wins 
 				
-			}else{ //if the if statement of the player score is false, obviously it's the computer who won
-				System.out.println("The computer won with the score of: "+computerScore+" Sorry you lost..."); //prints the computer won
-				computerWins += 1; //Adds 1 to the total number of player wins 
+				}else{ 
+					//if the if statement of the player score is false, obviously it's the computer who won
+					System.out.println("The computer won with the score of: "+computerScore+" Sorry you lost..."); //prints the computer won
+					computerWins += 1; //Adds 1 to the total number of player wins 
 			}
 			
 			boolean exitOption = false;//sets the exit question false to default or no
@@ -110,7 +113,7 @@ public static int playerTurn(){ //method for the user turn
 		//intitalizes the result turn = 0
 		int numTurns;
 		
-		numTurns = 1;
+		numTurns = 0;
 		//initalizes the number of turns taken to 1
 		while(numTurns!=3){
 			//while the nuber of turns is less than or equal to three
@@ -133,6 +136,7 @@ public static int playerTurn(){ //method for the user turn
 							int roll = r.nextInt(5)+1;
 							//adds 1 to random number
 							System.out.println("You rolled a "+roll+".");
+							System.out.println(" ");
 							
 							if (roll==1){
 								//if the roll is a 1, the turn is over the resultTurn is set to 0
@@ -187,45 +191,48 @@ public static int playerTurn(){ //method for the user turn
 		return resultTurn;	
 		//Ends the players turn
 	}
-public static int computerTurn() throws InterruptedException{   //the InterruptedException is what I used to slow the program down just a bit in order to get simulated feel as if you were playing a real game!
 	
-	int resultTurn; 
-	resultTurn = 0;
-	//intializes the computers roll score and sets it to 0
-	int numTurns;
-	numTurns = 1;
-	//number of terms is set to 1
-	System.out.println("Computer total is "+resultTurn+" Computer rolls.");
-	while(numTurns!=3){
-		//loop that checks the number of turns is less than 3 or equal to 
-		Random r = new Random();
-		int roll = r.nextInt(5)+1;
-		System.out.println("Computer rolled a "+roll+ ".");
+	public static int computerTurn() throws InterruptedException{   //the InterruptedException is what I used to slow the program down just a bit in order to get simulated feel as if you were playing a real game!
+	
+		int resultTurn; 
+		resultTurn = 0;
+		//intializes the computers roll score and sets it to 0
+		int numTurns;
+		numTurns = 0;
+		//number of terms is set to 1
 		
-		if (roll==1){
-			resultTurn = 0;
-			System.out.println("Computer total is "+resultTurn+ ". Computer Stops");
-			System.out.println("Turn over.");
+		while(numTurns!=3){
+			System.out.println("Computer total is "+resultTurn+" Computer rolls.");
+			//loop that checks the number of turns is less than 3 or equal to 
+			Random r = new Random();
+			int roll = r.nextInt(5)+1;
+			System.out.println("Computer rolled a "+roll+ ".");
 			System.out.println(" ");
-			return resultTurn;
-			
-		}
-		else{
-			resultTurn +=  roll;
-			Thread.sleep(900); //buffers the program about 50 seconds to get a simulated feel of the computer rolling dice	
-		}
 		
-		numTurns++;
+			if (roll==1){
+				resultTurn = 0;
+				System.out.println("Computer total is "+resultTurn+ ". Computer Stops");
+				System.out.println("Turn over.");
+				System.out.println(" ");
+				return resultTurn;
+			
+			}
+			else{
+				resultTurn +=  roll;
+				Thread.sleep(900); //buffers the program about 50 seconds to get a simulated feel of the computer rolling dice	
+			}	
+		
+			numTurns++;
+	
+		}	
+		System.out.println("Computer total is "+resultTurn+ ". Computer Stops");
+		System.out.println("Turn over.");
+		System.out.println(" ");
+		return resultTurn;
+		//Ends the computer turn	
+		
 	
 	}
-	System.out.println("Computer total is "+resultTurn+ ". Computer Stops");
-	System.out.println("Turn over.");
-	System.out.println(" ");
-	return resultTurn;
-	//Ends the computer turn	
-		
-	
-}
 
 	
 	
