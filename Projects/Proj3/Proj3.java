@@ -1,4 +1,5 @@
 /**
+ *
  * DESCRIPTION: This java program simulates a connect 4 game using arrays. 
  * Each player takes turns inserting a marker, for of the same marker, that player of that 
  * marker wins.
@@ -8,6 +9,7 @@
  * @version Project 3
  */
 
+ 
 
 import java.util.*;
 
@@ -20,21 +22,19 @@ public class Proj3 {
 		board = new char[6][7]; 
 		initializeGame(board);
 	
-	char turn = 0;
-	for (int count = 0; count < 42; count++) {
-		System.out.println("Current Board (user1 = O, user2 = X)");
-		printBoard();
-		turn++;
-		int user = 0;
-		if(turn % 2 == 0){
-			turn = 'X';
-			user = 2;
-		}else{
-			turn = 'O';
-			user = 1;
-		}
+		int turnNumber = 0;
+		char turn;
+		for (int count = 0; count < 42; count++) {
+			turnNumber++;
 		
-			int col = inputMove(turn, user);
+			turn = playerTurn(turnNumber);
+			int user = 0;
+			if(turn == 'X'){
+				user = 2;
+			}else{
+				user = 1;
+			}
+		int col = inputMove(turn, user);
 			
 			
 				//Simulates the gravity aspect of the following markers in the game
@@ -42,19 +42,17 @@ public class Proj3 {
 					
 						if(board[rowCount][col] != '_' ){
 							continue;
-					
 						}else{
 							board[rowCount][col] = turn;
 							break;
-							
 						}
 				}
 				//checks if there is a winner
 				if(checkForWinner()==true){
-					System.out.println("Current Board (user1 = O, user2 = X)");
+					System.out.println("\nCurrent Board (user1 = O, user2 = X)");
 					printBoard();
 
-					System.out.println("User "+user+" wins "+"("+turn+")");
+					System.out.println("\nUser "+user+" wins "+"("+turn+")");
 					
 					break;
 				}
@@ -63,20 +61,11 @@ public class Proj3 {
 					System.out.println("The board is full, it's a draw!)");
 					break;
 				}
-				
-				
-					
-					
 			}
-			
-	
 	}	
 	
-		
-		
-		
-		
-	/**
+	public static int inputMove(char turn, int user){
+		/**
 		 * Processes the input of the user(s)
 		 * 
 		 * turn is the value of the turn (e.g. O or X)  
@@ -84,26 +73,28 @@ public class Proj3 {
 		 * 
 		 * Returns the variable col, which is used to search the columns of the array
 		 */
-	public static int inputMove(char turn, int user){
-		
 		boolean validMove;
 		int col = -1;
 			do{
 				
 				System.out.print("User "+user+"("+ turn + "), Enter a col (0-6): ");
 				String input = s.nextLine();
+				//if someone presses 'enter' without inputting anything
 				if(input.isEmpty()){
 					input = "s";
+					//the empty input is replaced by a random character in this case a 's'
 				}
-				char valueInput = input.charAt(0);
-				validMove = checkMove(valueInput);
-				System.out.println(" ");
+					char valueInput = input.charAt(0);
+					validMove = checkMove(valueInput);
+					System.out.println(" ");
 				if(validMove == true){
 					col = Integer.parseInt(input);
 				}
 			}while(validMove != true|| col==-1 );
 			return col;
 	}
+		
+	public static boolean checkMove(char input){
 		/**
 		 * Checks if the user input is valid
 		 * 
@@ -111,8 +102,6 @@ public class Proj3 {
 		 * 
 		 * Returns a true or false if the input is valid
 		 */
-	public static boolean checkMove(char input){
-		
 		try{
 			
 		   int number = Character.getNumericValue(input);
@@ -134,13 +123,13 @@ public class Proj3 {
 		}
 			
 	}
+	
+	public static boolean checkForWinner(){
 		/**
 		 * Checks if there is four in a row: diagonally, horizontal, or vertical
 		 * 
 		 * If there is a winner, returns a true, if there is no winner, returns false
 		 */
-	public static boolean checkForWinner(){
-		
 		for (int x = 0; x < 4; x++){
 			 //Diagonally left
 				for(int y = 5 ; y > 2; y--){
@@ -209,14 +198,28 @@ public class Proj3 {
 		return false;
 	}
 	
+	public static char playerTurn(int turnNumber){
+		System.out.println("Current Board (user1 = O, user2 = X)");
+		printBoard();
+		char turn;
+		if(turnNumber % 2 == 0){
+			return turn = 'X';
+	
+		}else{
+			return turn = 'O';
+		}
 		
+		
+	}
+	
+		
+
+	public static boolean boardFull(){
 		/**
 		 *Checks is the board is full
 		 *
 		 * Returns a boolean true or false, true if full, false if there are still spaces
 		 */
-	public static boolean boardFull(){
-		
 		int count = 0;
 		for(int i=0; i < board.length; i++){
 			if(board[0][i]!='_'){
@@ -232,13 +235,13 @@ public class Proj3 {
 		//loop through and returns if board is full if not returns true
 		return false;
 	}
+		
+	public static void printBoard(){
 		/**
 		 *Prints out board
 		 *
 		 * Doesn't return anything but it prints out the board
 		 */
-	public static void printBoard(){
-		
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[0].length; j++) { 
 				System.out.print(board[i][j] + " "); 
@@ -251,13 +254,13 @@ public class Proj3 {
 		
 		
 	
+	
+	public static void initializeGame(char[][] board){
 		/**
 		 * Initializes the game, sets  each index of the board array to _
 		 *
 		 * Doesn't return anything, only sets up the board
 		 */
-	public static void initializeGame(char[][] board){
-		
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[0].length; j++) {
 				board[i][j] = '_'; 
@@ -266,7 +269,27 @@ public class Proj3 {
 			
 		}
 	}
-	
-	
-
 }
+
+ /*************************************************************************
+ * PROPERTY OF SHANE RIEGODEDIOS
+ * Use for educational purposes, DO NOT COPY
+ * __________________
+ * 
+ *  [2016] Shane Riegodedios, Matt Hixon, Lane Evans 
+ *  All Rights Reserved.
+ * 
+ * NOTICE:  All information contained herein is, and remains
+ * the property of its people: Shane Riegodedios, 
+ * Matt Hixon, and Lane Evans. The intellectual and technical concepts contained
+ * herein are proprietary to the Computer Information Sciences at K-State, 
+ * College of Engineering, Kansas State University, its original owners,
+ * and its suppliers and may be covered by U.S. and Foreign Patents,
+ * patents in process, and are protected by trade secret or copyright law.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained. 
+ * If this source code is found in any other program that is not owned by the people or affiliates mention 
+ * above than it is direct violation of the Kansas State Honor Code as plagirism and instuctors must 
+ * take disiplinary action. For more details about the honor code, it can be found here with this 
+ * link: https://www.k-state.edu/honor/
+ ******************************************************************************/
